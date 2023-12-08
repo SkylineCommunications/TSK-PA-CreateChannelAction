@@ -51,24 +51,64 @@ DATE		VERSION		AUTHOR			COMMENTS
 
 namespace TSK_PA_CreateChannelAction_1
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Globalization;
-	using System.Text;
-	using Skyline.DataMiner.Automation;
-	
-	/// <summary>
-	/// Represents a DataMiner Automation script.
-	/// </summary>
-	public class Script
-	{
-		/// <summary>
-		/// The script entry point.
-		/// </summary>
-		/// <param name="engine">Link with SLAutomation process.</param>
-		public void Run(IEngine engine)
-		{
-	
-		}
-	}
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Newtonsoft.Json;
+    using Skyline.DataMiner.Automation;
+    using Skyline.DataMiner.Library.Solutions.SRM;
+    using Skyline.DataMiner.Net.Apps.DataMinerObjectModel;
+    using Skyline.DataMiner.Net.Apps.DataMinerObjectModel.Actions;
+    using Skyline.DataMiner.Net.History;
+    using Skyline.DataMiner.Net.Messages;
+    using Skyline.DataMiner.Net.Messages.SLDataGateway;
+    using Skyline.DataMiner.Net.Profiles;
+    using Skyline.DataMiner.Net.ResourceManager.Objects;
+    using Skyline.DataMiner.Net.Sections;
+    using Skyline.DataMiner.DataMinerSolutions.ProcessAutomation.Objects;
+    using Skyline.DataMiner.DataMinerSolutions.ProcessAutomation.MessageHandler;
+    using Skyline.DataMiner.Net.LogHelpers;
+
+    /// <summary>
+    /// DataMiner Script Class.
+    /// </summary>
+    public class Script
+    {
+        private Engine _engine;
+
+        /// <summary>
+        /// The Script entry point.
+        /// </summary>
+        /// <param name="engine">Link with SLAutomation process.</param>
+        public void Run(Engine engine)
+        {
+
+            string guids = engine.GetScriptParam("guids").Value;
+            engine.GenerateInformation("guids: " + guids);
+
+
+            string processName = "Create Channel";
+
+
+            //string processName = "Create Channels";
+            var domHelper = new DomHelper(engine.SendSLNetMessages, "process_automation");
+            //var domInstanceFilter = DomInstanceExposers.Id.Equal(Guid.Parse(GUID));
+            List<Guid> allGuids = ParseGuidList(guids);
+
+            foreach (Guid myGuid in allGuids)
+            {
+                var domInstanceFilter = DomInstanceExposers.Id.Equal(myGuid);
+                var instances = domHelper.DomInstances.Read(domInstanceFilter).First();
+                ProcessHelper.PushToken(processName, "Jeroen", instances.ID);
+            }
+        }
+
+        private List<Guid> ParseGuidList(string guids)
+        {
+            guids = guids.Replace("[", "");
+            guids = guids.Replace("]", "");
+            guids = guids.Replace("\"", "");
+            return Array.ConvertAll(guids.Split(','), s => new Guid(s)).ToList();
+        }
+    }
 }

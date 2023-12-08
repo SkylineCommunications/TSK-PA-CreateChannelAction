@@ -14,12 +14,19 @@
 	</Memory>
 
 	<Parameters>
+		<ScriptParameter id="1" type="string" values="">
+			<Description>guids</Description>
+		</ScriptParameter>
 	</Parameters>
 
 	<Script>
-		<Exe id="1" type="csharp">
+		<Exe id="2" type="csharp">
 			<Value><![CDATA[[Project:TSK-PA-CreateChannelAction_1]]]></Value>
-			<!--<Param type="debug">true</Param>-->
+			<Param type="ref">Newtonsoft.Json.dll</Param>
+			<Param type="ref">SLSRMLibrary.dll</Param>
+			<Param type="ref">mscorlib.dll</Param>
+			<Param type="ref">ProcessAutomation.dll</Param>
+			<Param type="ref">SLCodeLibrary.dll</Param>
 			<Message></Message>
 		</Exe>
 	</Script>
